@@ -1,47 +1,73 @@
-/*
-https://w...content-available-to-author-only...e.com/watch?v=IFNibRVgFBo - Tushar Roy
- 
-Given n balloons, indexed from 0 to n-1. Each balloon is painted with a number on it represented by array nums. 
-You are asked to burst all the balloons. If the you burst balloon i you will get nums[left] * nums[i] * nums[right] coins.
-Here left and right are adjacent indices of i. After the burst, the left and right then becomes adjacent.
- 
-Find the maximum coins you can collect by bursting the balloons wisely.
-Input: [3,1,5,8]
-Output: 167 
-*/
- 
-#include<iostream>
-#include<vector>
-#include<algorithm>
+#include <iostream>
+#include <vector>
+#include <climits>
+#include <algorithm>
+
 using namespace std;
- 
-int maxCoins(vector<int>& v){
-    int n=v.size();
- 
-    vector<vector<int>> dp(n, vector<int>(n));
-    for(int len=2; len<=n; len++){
-        for(int i=0; i<=n-len; i++){
-            int j = i+len-1;
-            for(int k=i+1;k<j;k++){
-                dp[i][j] = max(dp[i][j], dp[i][k] + dp[k][j] + v[i] * v[k] * v[j]);
- 
-            }
-        }
+
+int burstBallon1(int i, int j, vector<int> &v, vector<vector<int>> &dp)
+{
+    if (i > j || j < i)
+        return 0;
+
+    if (i == j)
+        return v[i - 1] * v[i] * v[i + 1];
+
+    if (dp[i][j] != -1)
+        return dp[i][j];
+
+    int m = INT_MIN, temp;
+
+    for (int k = i; k <= j; k++)
+    {
+        temp = v[i - 1] * v[k] * v[j + 1] + burstBallon1(i, k - 1, v, dp) + burstBallon1(k + 1, j, v, dp);
+        m = max(m, temp);
     }
-    return dp[0][n-1];
- 
- 
+    return dp[i][j] = m;
 }
- 
-int main(){
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    int n; cin>>n;
-    vector<int>v(n+2,0);
-    v[0]=v[n+1]=1;
-    for(int i=1; i<=n; i++){
-        cin>>v[i];
+
+int burstBallon2(int i, int j, vector<int> &v, vector<vector<int>> &dp)
+{
+    if (i > j || j < i)
+        return 0;
+
+    if (i == j)
+        return v[i - 1] * v[i + 1];
+
+    if (dp[i][j] != -1)
+        return dp[i][j];
+
+    int m = INT_MIN, temp;
+
+    for (int k = i; k <= j; k++)
+    {
+        if (i == 1 && j == v.size() - 2)
+        {
+            temp = v[k] + burstBallon1(i, k - 1, v, dp) + burstBallon1(k + 1, j, v, dp);
+        }
+        else
+        {
+            temp = v[i - 1] * v[k] * v[j + 1] + burstBallon1(i, k - 1, v, dp) + burstBallon1(k + 1, j, v, dp);
+        }
+        m = max(m, temp);
     }
-    cout<<maxCoins(v)<<endl;
+    return dp[i][j] = m;
+}
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> nums(n + 2);
+    nums[0] = nums[n + 1] = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> nums[i];
+    }
+
+    vector<vector<int>> dp(n + 4, vector<int>(n + 4, -1));
+
+    cout << "ans: " << burstBallon1(1, n, nums, dp) << endl;
+
     return 0;
 }

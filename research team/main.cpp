@@ -232,7 +232,6 @@ int main()
             for (int j = 0; j < n; j++)
             {
                 int dis = bfs(i, j, elements, space, m);
-                // cout<<i<<" "<<j<<" "<<dis<<endl;
                 ans = min(ans, dis);
             }
         }
