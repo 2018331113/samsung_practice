@@ -1,0 +1,1 @@
+map[p.first][p.second] = 0;
